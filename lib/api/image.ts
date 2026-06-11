@@ -1,10 +1,11 @@
 import { ImageGenerationParams } from '@/types/image';
 import { ImageGenerationResponse } from '@/types/api';
+import { getApiKey } from './client';
 
 export async function generateImage(
   params: ImageGenerationParams
 ): Promise<string> {
-  const apiKey = typeof window !== 'undefined' ? localStorage.getItem('api_key') || '' : '';
+  const apiKey = getApiKey();
 
   const response = await fetch('/api/image', {
     method: 'POST',

@@ -12,10 +12,3 @@ export interface Conversation {
   createdAt: number;
   updatedAt: number;
 }
-
-export interface ChatState {
-  conversations: Conversation[];
-  currentConversationId: string | null;
-  streamingMessage: string;
-  isStreaming: boolean;
-}

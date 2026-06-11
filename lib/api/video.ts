@@ -1,10 +1,11 @@
 import { VideoGenerationParams } from '@/types/video';
 import { VideoCreateResponse, VideoStatusResponse } from '@/types/api';
+import { getApiKey } from './client';
 
 export async function createVideoTask(
   params: VideoGenerationParams
 ): Promise<VideoCreateResponse> {
-  const apiKey = typeof window !== 'undefined' ? localStorage.getItem('api_key') || '' : '';
+  const apiKey = getApiKey();
 
   const response = await fetch('/api/video/create', {
     method: 'POST',
@@ -24,7 +25,7 @@ export async function createVideoTask(
 }
 
 export async function getVideoStatus(videoId: string): Promise<VideoStatusResponse> {
-  const apiKey = typeof window !== 'undefined' ? localStorage.getItem('api_key') || '' : '';
+  const apiKey = getApiKey();
 
   const response = await fetch(`/api/video/query?video_id=${encodeURIComponent(videoId)}`, {
     headers: {

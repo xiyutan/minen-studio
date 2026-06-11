@@ -1,4 +1,5 @@
 import { ChatCompletionMessage } from '@/types/api';
+import { getApiKey } from './client';
 
 export async function streamChatCompletion(
   messages: ChatCompletionMessage[],
@@ -7,7 +8,7 @@ export async function streamChatCompletion(
   onError: (error: Error) => void
 ) {
   try {
-    const apiKey = typeof window !== 'undefined' ? localStorage.getItem('api_key') || '' : '';
+    const apiKey = getApiKey();
 
     const response = await fetch('/api/chat', {
       method: 'POST',

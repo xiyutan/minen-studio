@@ -28,8 +28,3 @@ export interface VideoGenerationParams {
   seed?: number;
   negative_prompt?: string;
 }
-
-export interface VideoState {
-  tasks: Map<string, VideoTask>;
-  activePolling: Set<string>;
-}
