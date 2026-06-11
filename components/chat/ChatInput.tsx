@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Send } from 'lucide-react';
+import { Send, Square } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
 import { streamChatCompletion } from '@/lib/api/chat';
 import { useChatStore } from '@/store/chatStore';
 
@@ -12,6 +13,7 @@ export function ChatInput() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const {
     currentConversationId,
@@ -29,8 +31,8 @@ export function ChatInput() {
     }
   }, [input]);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = async (event?: React.FormEvent) => {
+    event?.preventDefault();
 
     if (!input.trim() || isLoading) return;
 
@@ -51,6 +53,9 @@ export function ChatInput() {
     setIsStreaming(true);
     updateStreamingMessage('');
 
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
       const messages =
         useChatStore
@@ -66,17 +71,21 @@ export function ChatInput() {
       await streamChatCompletion(
         messages,
         (chunk) => {
+          if (controller.signal.aborted) return;
           fullContent += chunk;
           updateStreamingMessage(fullContent);
         },
         () => {
           finalizeStreamingMessage(conversationId);
           setIsLoading(false);
+          abortControllerRef.current = null;
         },
         (error) => {
+          if (controller.signal.aborted) return;
           console.error('流式响应错误:', error);
           setIsStreaming(false);
           setIsLoading(false);
+          abortControllerRef.current = null;
           toast.error(`发送失败: ${error.message}`);
         }
       );
@@ -84,14 +93,39 @@ export function ChatInput() {
       console.error('发送消息错误:', error);
       setIsStreaming(false);
       setIsLoading(false);
+      abortControllerRef.current = null;
       toast.error('发送失败，请稍后重试');
     }
   };
 
+  const handleInterrupt = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsStreaming(false);
+      setIsLoading(false);
+      toast.info('已中断生成');
+    }
+  };
+
+  const handleNewConversation = () => {
+    createConversation();
+  };
+
+  useKeyboardShortcuts({
+    onSendMessage: () => {
+      if (!isLoading && input.trim()) {
+        void handleSubmit();
+      }
+    },
+    onNewConversation: handleNewConversation,
+    onInterrupt: handleInterrupt,
+  });
+
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
-      void handleSubmit(event);
+      void handleSubmit();
     }
   };
 
@@ -103,13 +137,28 @@ export function ChatInput() {
           value={input}
           onChange={(event) => setInput(event.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="输入消息...（Shift + Enter 换行）"
+          placeholder="输入消息...（Ctrl+Enter 发送，Esc 中断）"
           className="max-h-48 min-h-14 resize-none"
           disabled={isLoading}
         />
-        <Button type="submit" size="icon" disabled={isLoading || !input.trim()} aria-label="发送">
-          <Send className="h-4 w-4" />
-        </Button>
+        {isLoading ? (
+          <Button
+            type="button"
+            size="icon"
+            onClick={handleInterrupt}
+            variant="destructive"
+            aria-label="中断"
+          >
+            <Square className="h-4 w-4" />
+          </Button>
+        ) : (
+          <Button type="submit" size="icon" disabled={!input.trim()} aria-label="发送">
+            <Send className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+      <div className="mt-2 flex justify-end text-xs text-muted-foreground">
+        <span>Ctrl+N 新建 · Ctrl+Enter 发送 · Esc 中断</span>
       </div>
     </form>
   );

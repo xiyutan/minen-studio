@@ -1,6 +1,7 @@
 'use client';
 
 import { Bot } from 'lucide-react';
+import { MessageContent } from './MessageContent';
 
 interface StreamingMessageProps {
   content: string;
@@ -15,7 +16,7 @@ export function StreamingMessage({ content }: StreamingMessageProps) {
       <div className="min-w-0 flex-1">
         <div className="mb-1 font-semibold">Assistant</div>
         <div className="whitespace-pre-wrap break-words">
-          {content}
+          <MessageContent content={content} />
           <span className="ml-1 inline-block h-4 w-2 animate-pulse bg-primary" />
         </div>
       </div>
