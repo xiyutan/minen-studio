@@ -130,7 +130,7 @@ export function ChatInput() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border-t p-3 md:p-4">
+    <form onSubmit={handleSubmit} className="shrink-0 border-t p-3 md:p-4">
       <div className="flex gap-2">
         <Textarea
           ref={textareaRef}

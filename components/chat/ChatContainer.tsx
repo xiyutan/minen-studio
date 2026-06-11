@@ -26,7 +26,7 @@ export function ChatContainer() {
   }, [createConversation, loadConversations, setCurrentConversation]);
 
   return (
-    <div className="flex h-full flex-col md:flex-row">
+    <div className="flex h-full min-h-0 flex-col md:flex-row">
       <ConversationList />
       <div className="flex min-h-0 flex-1 flex-col">
         <MessageList />
