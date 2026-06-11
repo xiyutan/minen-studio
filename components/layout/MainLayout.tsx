@@ -2,6 +2,7 @@
 
 import { BottomNav, Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { ApiKeyPrompt } from '@/components/settings/ApiKeyPrompt';
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
         <Header />
         <main className="min-h-0 flex-1 overflow-auto pb-24 md:pb-0">{children}</main>
       </div>
+      <ApiKeyPrompt />
       <BottomNav />
     </div>
   );

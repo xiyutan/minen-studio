@@ -7,10 +7,10 @@ export function formatDurationMs(ms?: number) {
   const seconds = totalSeconds % 60;
 
   if (minutes === 0) {
-    return `${seconds}秒`;
+    return `${seconds} 秒`;
   }
 
-  return `${minutes}分${seconds}秒`;
+  return `${minutes} 分 ${seconds} 秒`;
 }
 
 export function formatClock(timestamp?: number) {

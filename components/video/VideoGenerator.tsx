@@ -36,7 +36,8 @@ function getErrorMessage(error: unknown) {
 }
 
 export function VideoGenerator() {
-  const { tasks, addTask, updateTaskStatus, startPolling, stopPolling, loadTasks } = useVideoStore();
+  const { tasks, addTask, updateTaskStatus, deleteTask, startPolling, stopPolling, loadTasks } =
+    useVideoStore();
   const [isCreating, setIsCreating] = useState(false);
   const [creationStartedAt, setCreationStartedAt] = useState<number | null>(null);
   const [creationNow, setCreationNow] = useState<number | null>(null);
@@ -52,6 +53,12 @@ export function VideoGenerator() {
     pollingFailuresRef.current.delete(videoId);
     stopPolling(videoId);
   }, [stopPolling]);
+
+  const deleteVideoTask = useCallback((videoId: string) => {
+    stopPollingTask(videoId);
+    deleteTask(videoId);
+    toast.success('视频任务已删除');
+  }, [deleteTask, stopPollingTask]);
 
   const pollTaskStatus = useCallback(async (videoId: string) => {
     try {
@@ -206,7 +213,7 @@ export function VideoGenerator() {
             isGenerating={isCreating}
             creatingElapsedMs={creatingElapsedMs}
           />
-          <VideoQueue tasks={taskList} />
+          <VideoQueue tasks={taskList} onDeleteTask={deleteVideoTask} />
         </div>
       </div>
     </div>

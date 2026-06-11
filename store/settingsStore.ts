@@ -14,7 +14,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   theme: 'light',
 
   setApiKey: (key: string) => {
-    set({ apiKey: key });
+    set({ apiKey: key.trim() });
     get().saveSettings();
   },
 

@@ -54,11 +54,32 @@ export default function SettingsPage() {
                 <Input
                   type="password"
                   value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
+                  onChange={(event) => setInputValue(event.target.value)}
                   placeholder="输入你的 API Key"
                 />
               </div>
               <Button onClick={handleSave}>保存设置</Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>数据保存位置</CardTitle>
+              <CardDescription>聊天、图片、视频历史都保存在当前浏览器本地</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              <p>
+                <strong>聊天历史:</strong> localStorage key 为 <code>chat_history</code>
+              </p>
+              <p>
+                <strong>图片历史:</strong> localStorage key 为 <code>image_gallery</code>
+              </p>
+              <p>
+                <strong>视频历史:</strong> localStorage key 为 <code>video_history</code>
+              </p>
+              <p className="text-muted-foreground">
+                图片和视频文件不会保存到项目目录，应用只保存上游接口返回的远程 URL；点击下载后才会进入浏览器默认下载目录。
+              </p>
             </CardContent>
           </Card>
 
@@ -78,7 +99,7 @@ export default function SettingsPage() {
                 <strong>技术栈:</strong> Next.js 16、TypeScript、Tailwind CSS、shadcn/ui、Zustand
               </p>
               <p className="text-muted-foreground">
-                Minen Studio 是独立构建的应用，不代表 Agnes AI 官方产品或官方背书。生成结果由上游模型和用户输入共同决定，请自行确认内容的准确性、版权和合规性。
+                Minen Studio 是独立构建的应用，不代表 Agnes AI 官方产品或官方背书。
               </p>
             </CardContent>
           </Card>

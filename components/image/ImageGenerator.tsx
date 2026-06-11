@@ -15,6 +15,8 @@ export function ImageGenerator() {
     isGenerating,
     currentImage,
     addToGallery,
+    deleteImage,
+    clearGallery,
     setIsGenerating,
     setCurrentImage,
     loadGallery,
@@ -49,6 +51,16 @@ export function ImageGenerator() {
     }
   };
 
+  const handleDelete = (imageId: string) => {
+    deleteImage(imageId);
+    toast.success('图片已删除');
+  };
+
+  const handleClear = () => {
+    clearGallery();
+    toast.success('图片历史已清空');
+  };
+
   return (
     <div className="h-full overflow-y-auto p-4 md:p-6">
       <div className="mx-auto max-w-6xl space-y-6">
@@ -61,12 +73,21 @@ export function ImageGenerator() {
           <TabsContent value="generate" className="space-y-6">
             <div className="grid gap-6 md:grid-cols-2">
               <ImagePromptInput onGenerate={handleGenerate} isGenerating={isGenerating} />
-              <ImagePreview image={currentImage} isGenerating={isGenerating} />
+              <ImagePreview
+                image={currentImage}
+                isGenerating={isGenerating}
+                onDelete={handleDelete}
+              />
             </div>
           </TabsContent>
 
           <TabsContent value="gallery">
-            <ImageGallery images={gallery} onImageClick={setCurrentImage} />
+            <ImageGallery
+              images={gallery}
+              onImageClick={setCurrentImage}
+              onDelete={handleDelete}
+              onClear={handleClear}
+            />
           </TabsContent>
         </Tabs>
       </div>

@@ -7,6 +7,7 @@ interface ImageState {
   currentImage: GeneratedImage | null;
 
   addToGallery: (image: GeneratedImage) => void;
+  deleteImage: (id: string) => void;
   setIsGenerating: (isGenerating: boolean) => void;
   setCurrentImage: (image: GeneratedImage | null) => void;
   clearGallery: () => void;
@@ -27,6 +28,17 @@ export const useImageStore = create<ImageState>((set, get) => ({
     get().saveGallery();
   },
 
+  deleteImage: (id: string) => {
+    set((state) => {
+      const gallery = state.gallery.filter((image) => image.id !== id);
+      const currentImage =
+        state.currentImage?.id === id ? gallery[0] ?? null : state.currentImage;
+
+      return { gallery, currentImage };
+    });
+    get().saveGallery();
+  },
+
   setIsGenerating: (isGenerating: boolean) => {
     set({ isGenerating });
   },
@@ -36,24 +48,29 @@ export const useImageStore = create<ImageState>((set, get) => ({
   },
 
   clearGallery: () => {
-    set({ gallery: [] });
+    set({ gallery: [], currentImage: null });
     get().saveGallery();
   },
 
   loadGallery: () => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('image_gallery');
-      if (saved) {
-        const gallery = JSON.parse(saved);
-        set({ gallery });
-      }
+    if (typeof window === 'undefined') return;
+
+    const saved = localStorage.getItem('image_gallery');
+    if (!saved) return;
+
+    try {
+      const gallery = JSON.parse(saved) as GeneratedImage[];
+      set({ gallery });
+    } catch (error) {
+      console.error('加载图片历史失败:', error);
+      localStorage.removeItem('image_gallery');
     }
   },
 
   saveGallery: () => {
-    if (typeof window !== 'undefined') {
-      const { gallery } = get();
-      localStorage.setItem('image_gallery', JSON.stringify(gallery));
-    }
+    if (typeof window === 'undefined') return;
+
+    const { gallery } = get();
+    localStorage.setItem('image_gallery', JSON.stringify(gallery));
   },
 }));

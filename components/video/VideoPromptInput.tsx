@@ -66,8 +66,8 @@ export function VideoPromptInput({
   const [numFrames, setNumFrames] = useState(videoPresets.fast.numFrames);
   const [frameRate, setFrameRate] = useState('24');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
     if (prompt.trim() && !isGenerating) {
       const selectedPreset = videoPresets[preset];
       onGenerate(prompt.trim(), {
@@ -97,7 +97,7 @@ export function VideoPromptInput({
         <label className="mb-2 block text-sm font-medium">提示词</label>
         <Textarea
           value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
+          onChange={(event) => setPrompt(event.target.value)}
           placeholder="描述你想生成的视频，例如：一只猫在海滩上行走，日落时分，温暖的金色光线，写实风格"
           className="min-h-28"
           disabled={isGenerating}

@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Download, Loader2 } from 'lucide-react';
+import { Download, Loader2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { GeneratedImage } from '@/types/image';
@@ -9,9 +9,10 @@ import { GeneratedImage } from '@/types/image';
 interface ImagePreviewProps {
   image: GeneratedImage | null;
   isGenerating: boolean;
+  onDelete?: (id: string) => void;
 }
 
-export function ImagePreview({ image, isGenerating }: ImagePreviewProps) {
+export function ImagePreview({ image, isGenerating, onDelete }: ImagePreviewProps) {
   const handleDownload = async () => {
     if (!image) return;
 
@@ -19,13 +20,13 @@ export function ImagePreview({ image, isGenerating }: ImagePreviewProps) {
       const response = await fetch(image.url);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `agnes-image-${image.id}.png`;
-      document.body.appendChild(a);
-      a.click();
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `agnes-image-${image.id}.png`;
+      document.body.appendChild(anchor);
+      anchor.click();
       window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      document.body.removeChild(anchor);
     } catch (error) {
       console.error('下载失败:', error);
     }
@@ -66,10 +67,18 @@ export function ImagePreview({ image, isGenerating }: ImagePreviewProps) {
       </Card>
       <div className="flex items-start justify-between gap-4">
         <p className="line-clamp-2 flex-1 text-sm text-muted-foreground">{image.prompt}</p>
-        <Button onClick={handleDownload} variant="outline" size="sm">
-          <Download className="mr-2 h-4 w-4" />
-          下载
-        </Button>
+        <div className="flex shrink-0 gap-2">
+          {onDelete && (
+            <Button onClick={() => onDelete(image.id)} variant="destructive" size="sm">
+              <Trash2 className="mr-2 h-4 w-4" />
+              删除
+            </Button>
+          )}
+          <Button onClick={handleDownload} variant="outline" size="sm">
+            <Download className="mr-2 h-4 w-4" />
+            下载
+          </Button>
+        </div>
       </div>
     </div>
   );

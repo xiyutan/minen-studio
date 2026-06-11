@@ -15,8 +15,8 @@ export function ImagePromptInput({ onGenerate, isGenerating }: ImagePromptInputP
   const [prompt, setPrompt] = useState('');
   const [size, setSize] = useState('1024x768');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
     if (prompt.trim() && !isGenerating) {
       onGenerate(prompt.trim(), size);
     }
@@ -28,7 +28,7 @@ export function ImagePromptInput({ onGenerate, isGenerating }: ImagePromptInputP
         <label className="mb-2 block text-sm font-medium">提示词</label>
         <Textarea
           value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
+          onChange={(event) => setPrompt(event.target.value)}
           placeholder="描述你想生成的图片，例如：一座漂浮在云端的未来城市，日出时分，电影级写实风格"
           className="min-h-28"
           disabled={isGenerating}

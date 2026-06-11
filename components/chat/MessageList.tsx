@@ -11,7 +11,7 @@ export function MessageList() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const currentConversation = conversations.find(
-    (c) => c.id === currentConversationId
+    (conversation) => conversation.id === currentConversationId
   );
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export function MessageList() {
       <div className="flex flex-1 items-center justify-center px-4 text-muted-foreground">
         <div className="text-center">
           <p className="mb-2 text-lg">欢迎使用 Minen Studio</p>
-          <p className="text-sm">开始新的对话吧</p>
+          <p className="text-sm">新建或选择一个对话开始创作</p>
         </div>
       </div>
     );

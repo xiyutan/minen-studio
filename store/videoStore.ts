@@ -7,6 +7,7 @@ interface VideoState {
 
   addTask: (task: VideoTask) => void;
   updateTaskStatus: (taskId: string, updates: Partial<VideoTask>) => void;
+  deleteTask: (taskId: string) => void;
   startPolling: (taskId: string) => void;
   stopPolling: (taskId: string) => void;
   getCompletedVideos: () => VideoTask[];
@@ -29,15 +30,33 @@ export const useVideoStore = create<VideoState>((set, get) => ({
   },
 
   updateTaskStatus: (taskId: string, updates: Partial<VideoTask>) => {
-    set((state) => ({
-      tasks: {
-        ...state.tasks,
-        [taskId]: {
-          ...state.tasks[taskId],
-          ...updates,
+    set((state) => {
+      const task = state.tasks[taskId];
+      if (!task) return state;
+
+      return {
+        tasks: {
+          ...state.tasks,
+          [taskId]: {
+            ...task,
+            ...updates,
+          },
         },
-      },
-    }));
+      };
+    });
+    get().saveTasks();
+  },
+
+  deleteTask: (taskId: string) => {
+    set((state) => {
+      const tasks = { ...state.tasks };
+      delete tasks[taskId];
+
+      return {
+        tasks,
+        activePolling: state.activePolling.filter((id) => id !== taskId),
+      };
+    });
     get().saveTasks();
   },
 
@@ -61,24 +80,24 @@ export const useVideoStore = create<VideoState>((set, get) => ({
   },
 
   loadTasks: () => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('video_history');
-      if (saved) {
-        try {
-          const tasks = JSON.parse(saved);
-          set({ tasks });
-        } catch (error) {
-          console.error('加载视频历史失败:', error);
-          localStorage.removeItem('video_history');
-        }
-      }
+    if (typeof window === 'undefined') return;
+
+    const saved = localStorage.getItem('video_history');
+    if (!saved) return;
+
+    try {
+      const tasks = JSON.parse(saved) as Record<string, VideoTask>;
+      set({ tasks });
+    } catch (error) {
+      console.error('加载视频历史失败:', error);
+      localStorage.removeItem('video_history');
     }
   },
 
   saveTasks: () => {
-    if (typeof window !== 'undefined') {
-      const { tasks } = get();
-      localStorage.setItem('video_history', JSON.stringify(tasks));
-    }
+    if (typeof window === 'undefined') return;
+
+    const { tasks } = get();
+    localStorage.setItem('video_history', JSON.stringify(tasks));
   },
 }));

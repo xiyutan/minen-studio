@@ -58,8 +58,8 @@ export async function streamChatCompletion(
             if (content) {
               onChunk(content);
             }
-          } catch (e) {
-            console.error('解析 SSE 数据失败:', e);
+          } catch (error) {
+            console.error('解析 SSE 数据失败:', error);
           }
         }
       }

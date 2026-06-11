@@ -29,8 +29,8 @@ export function ChatInput() {
     }
   }, [input]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
 
     if (!input.trim() || isLoading) return;
 
@@ -38,12 +38,12 @@ export function ChatInput() {
     setInput('');
     setIsLoading(true);
 
-    let convId = currentConversationId;
-    if (!convId) {
-      convId = createConversation();
+    let conversationId = currentConversationId;
+    if (!conversationId) {
+      conversationId = createConversation();
     }
 
-    addMessage(convId, {
+    addMessage(conversationId, {
       role: 'user',
       content: message,
     });
@@ -52,12 +52,14 @@ export function ChatInput() {
     updateStreamingMessage('');
 
     try {
-      const messages = useChatStore.getState().conversations
-        .find((c) => c.id === convId)
-        ?.messages.map((m) => ({
-          role: m.role,
-          content: m.content,
-        })) || [];
+      const messages =
+        useChatStore
+          .getState()
+          .conversations.find((conversation) => conversation.id === conversationId)
+          ?.messages.map((storedMessage) => ({
+            role: storedMessage.role,
+            content: storedMessage.content,
+          })) || [];
 
       let fullContent = '';
 
@@ -68,7 +70,7 @@ export function ChatInput() {
           updateStreamingMessage(fullContent);
         },
         () => {
-          finalizeStreamingMessage(convId);
+          finalizeStreamingMessage(conversationId);
           setIsLoading(false);
         },
         (error) => {
@@ -86,10 +88,10 @@ export function ChatInput() {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      void handleSubmit(e);
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      void handleSubmit(event);
     }
   };
 
@@ -99,7 +101,7 @@ export function ChatInput() {
         <Textarea
           ref={textareaRef}
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(event) => setInput(event.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="输入消息...（Shift + Enter 换行）"
           className="max-h-48 min-h-14 resize-none"

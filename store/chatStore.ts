@@ -9,6 +9,7 @@ interface ChatState {
 
   createConversation: () => string;
   setCurrentConversation: (id: string) => void;
+  deleteConversation: (id: string) => void;
   addMessage: (conversationId: string, message: Omit<Message, 'id' | 'timestamp'>) => void;
   updateStreamingMessage: (content: string) => void;
   setIsStreaming: (isStreaming: boolean) => void;
@@ -32,6 +33,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
+
     set((state) => ({
       conversations: [newConversation, ...state.conversations],
       currentConversationId: id,
@@ -42,6 +44,19 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   setCurrentConversation: (id: string) => {
     set({ currentConversationId: id });
+  },
+
+  deleteConversation: (id: string) => {
+    set((state) => {
+      const conversations = state.conversations.filter((conv) => conv.id !== id);
+      const currentConversationId =
+        state.currentConversationId === id
+          ? conversations[0]?.id ?? null
+          : state.currentConversationId;
+
+      return { conversations, currentConversationId };
+    });
+    get().saveConversations();
   },
 
   addMessage: (conversationId: string, message) => {
@@ -58,9 +73,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
               ...conv,
               messages: [...conv.messages, newMessage],
               updatedAt: Date.now(),
-              title: conv.messages.length === 0 && message.role === 'user'
-                ? message.content.slice(0, 30) + (message.content.length > 30 ? '...' : '')
-                : conv.title,
+              title:
+                conv.messages.length === 0 && message.role === 'user'
+                  ? message.content.slice(0, 30) + (message.content.length > 30 ? '...' : '')
+                  : conv.title,
             }
           : conv
       ),
@@ -88,19 +104,24 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   loadConversations: () => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('chat_history');
-      if (saved) {
-        const conversations = JSON.parse(saved);
-        set({ conversations });
-      }
+    if (typeof window === 'undefined') return;
+
+    const saved = localStorage.getItem('chat_history');
+    if (!saved) return;
+
+    try {
+      const conversations = JSON.parse(saved) as Conversation[];
+      set({ conversations });
+    } catch (error) {
+      console.error('加载聊天历史失败:', error);
+      localStorage.removeItem('chat_history');
     }
   },
 
   saveConversations: () => {
-    if (typeof window !== 'undefined') {
-      const { conversations } = get();
-      localStorage.setItem('chat_history', JSON.stringify(conversations));
-    }
+    if (typeof window === 'undefined') return;
+
+    const { conversations } = get();
+    localStorage.setItem('chat_history', JSON.stringify(conversations));
   },
 }));

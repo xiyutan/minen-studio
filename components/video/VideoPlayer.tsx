@@ -1,6 +1,6 @@
 'use client';
 
-import { Download } from 'lucide-react';
+import { Download, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { VideoTask } from '@/types/video';
@@ -8,20 +8,21 @@ import { formatClock, formatDurationMs } from './videoTiming';
 
 interface VideoPlayerProps {
   task: VideoTask;
+  onDelete: (taskId: string) => void;
 }
 
-export function VideoPlayer({ task }: VideoPlayerProps) {
+export function VideoPlayer({ task, onDelete }: VideoPlayerProps) {
   if (!task.videoUrl) {
     return null;
   }
 
   const handleDownload = () => {
-    const a = document.createElement('a');
-    a.href = task.videoUrl!;
-    a.download = `agnes-video-${task.id}.mp4`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const anchor = document.createElement('a');
+    anchor.href = task.videoUrl!;
+    anchor.download = `agnes-video-${task.id}.mp4`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
   };
 
   return (
@@ -49,10 +50,16 @@ export function VideoPlayer({ task }: VideoPlayerProps) {
           <div className="min-w-0 truncate text-xs text-muted-foreground">
             {task.duration} / {task.size}
           </div>
-          <Button onClick={handleDownload} variant="outline" size="sm">
-            <Download className="mr-2 h-4 w-4" />
-            下载
-          </Button>
+          <div className="flex shrink-0 gap-2">
+            <Button onClick={() => onDelete(task.taskId)} variant="destructive" size="sm">
+              <Trash2 className="mr-2 h-4 w-4" />
+              删除
+            </Button>
+            <Button onClick={handleDownload} variant="outline" size="sm">
+              <Download className="mr-2 h-4 w-4" />
+              下载
+            </Button>
+          </div>
         </div>
       </div>
     </Card>

@@ -1,6 +1,7 @@
 'use client';
 
-import { CheckCircle2, Clock, Loader2, XCircle } from 'lucide-react';
+import { CheckCircle2, Clock, Loader2, Trash2, XCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { VideoTask } from '@/types/video';
@@ -8,9 +9,10 @@ import { formatClock, formatDurationMs } from './videoTiming';
 
 interface VideoProgressProps {
   task: VideoTask;
+  onDelete: (taskId: string) => void;
 }
 
-export function VideoProgress({ task }: VideoProgressProps) {
+export function VideoProgress({ task, onDelete }: VideoProgressProps) {
   const getStatusIcon = () => {
     switch (task.status) {
       case 'completed':
@@ -51,6 +53,15 @@ export function VideoProgress({ task }: VideoProgressProps) {
             任务 ID: {task.taskId.slice(0, 20)}...
           </p>
         </div>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={() => onDelete(task.taskId)}
+          aria-label={`删除视频任务 ${task.taskId}`}
+          className="text-muted-foreground hover:text-destructive"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
       </div>
 
       <div className="space-y-2">

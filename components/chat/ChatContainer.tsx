@@ -1,10 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
-import { PlusCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useChatStore } from '@/store/chatStore';
 import { ChatInput } from './ChatInput';
+import { ConversationList } from './ConversationList';
 import { MessageList } from './MessageList';
 
 export function ChatContainer() {
@@ -27,16 +26,12 @@ export function ChatContainer() {
   }, [createConversation, loadConversations, setCurrentConversation]);
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b p-4">
-        <h2 className="text-lg font-semibold">对话</h2>
-        <Button variant="outline" size="sm" onClick={createConversation}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          新对话
-        </Button>
+    <div className="flex h-full flex-col md:flex-row">
+      <ConversationList />
+      <div className="flex min-h-0 flex-1 flex-col">
+        <MessageList />
+        <ChatInput />
       </div>
-      <MessageList />
-      <ChatInput />
     </div>
   );
 }
