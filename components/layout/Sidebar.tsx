@@ -2,7 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Image, MessageSquare, Settings, Video } from 'lucide-react';
+import { Monitor, Moon, Sun, Image, MessageSquare, Settings, Video } from 'lucide-react';
+import { useSettingsStore } from '@/store/settingsStore';
+
+type Theme = 'light' | 'dark' | 'system';
 
 const primaryNavItems = [
   { href: '/chat', label: '聊天', icon: MessageSquare },
@@ -12,8 +15,29 @@ const primaryNavItems = [
 
 const settingsNavItem = { href: '/settings', label: '设置', icon: Settings };
 
+const themeCycle: Theme[] = ['light', 'dark', 'system'];
+const themeIcons: Record<Theme, typeof Sun> = {
+  light: Sun,
+  dark: Moon,
+  system: Monitor,
+};
+const themeLabels: Record<Theme, string> = {
+  light: '浅色模式',
+  dark: '深色模式',
+  system: '跟随系统',
+};
+
 export function Sidebar() {
   const pathname = usePathname();
+  const { theme, setTheme } = useSettingsStore();
+
+  const handleThemeToggle = () => {
+    const currentIndex = themeCycle.indexOf(theme);
+    const nextTheme = themeCycle[(currentIndex + 1) % themeCycle.length];
+    setTheme(nextTheme);
+  };
+
+  const ThemeIcon = themeIcons[theme];
 
   return (
     <aside className="hidden h-dvh w-64 shrink-0 border-r bg-background md:flex md:flex-col">
@@ -44,7 +68,16 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="border-t p-4">
+      <div className="space-y-2 border-t p-4">
+        <button
+          type="button"
+          onClick={handleThemeToggle}
+          className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-colors hover:bg-muted"
+          title={`当前: ${themeLabels[theme]}`}
+        >
+          <ThemeIcon className="h-5 w-5" />
+          <span>{themeLabels[theme]}</span>
+        </button>
         <SideNavLink item={settingsNavItem} isActive={pathname === settingsNavItem.href} />
       </div>
     </aside>

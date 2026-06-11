@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Monitor, Moon, Sun } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,11 +9,17 @@ import { Input } from '@/components/ui/input';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { useSettingsStore } from '@/store/settingsStore';
 
+type Theme = 'light' | 'dark' | 'system';
+
+const themeOptions: { value: Theme; label: string; icon: typeof Sun }[] = [
+  { value: 'light', label: '浅色', icon: Sun },
+  { value: 'dark', label: '深色', icon: Moon },
+  { value: 'system', label: '跟随系统', icon: Monitor },
+];
+
 export default function SettingsPage() {
-  const { setApiKey, loadSettings } = useSettingsStore();
-  const [inputValue, setInputValue] = useState(() =>
-    typeof window !== 'undefined' ? localStorage.getItem('api_key') || '' : ''
-  );
+  const { apiKey, theme, setApiKey, setTheme, loadSettings } = useSettingsStore();
+  const [inputValue, setInputValue] = useState(apiKey);
 
   useEffect(() => {
     loadSettings();
@@ -31,6 +38,28 @@ export default function SettingsPage() {
             <h1 className="mb-2 text-2xl font-bold md:text-3xl">设置</h1>
             <p className="text-muted-foreground">配置你的 Minen Studio 应用</p>
           </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>外观</CardTitle>
+              <CardDescription>自定义应用的外观和主题</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 gap-3">
+                {themeOptions.map(({ value, label, icon: Icon }) => (
+                  <Button
+                    key={value}
+                    variant={theme === value ? 'default' : 'outline'}
+                    className="flex flex-col gap-2 py-6"
+                    onClick={() => setTheme(value)}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span>{label}</span>
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
           <Card>
             <CardHeader>
